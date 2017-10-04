@@ -27,7 +27,7 @@ void create_histogram2d(string xbin_filename,
 
   // Create the histo, open the file and fill it
   TH2F *histo2d = new TH2F("h2","",xbin.size()-1,&xbin[0], ybin.size()-1, &ybin[0]);
-  ifstream datafile("data.txt");
+  ifstream datafile(data_filename);
   string line;
   // Temporaire
   Float_t x,y;
