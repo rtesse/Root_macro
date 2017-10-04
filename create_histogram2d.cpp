@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <stdio.h>
 
 using namespace std;
 
@@ -15,8 +16,8 @@ vector<Double_t> readfile(string filename);
 
 void create_histogram2d(string xbin_filename,
                         string ybin_filename,
-                        string histo_filename,
-                        string data_filename)
+                        string data_filename,
+                        string histo_filename)
 {
   vector<Double_t> xbin = readfile(xbin_filename);
   vector<Double_t> ybin = readfile(ybin_filename);
@@ -55,6 +56,11 @@ void create_histogram2d(string xbin_filename,
   c1->SaveAs(root_filename.c_str());
   c1->SaveAs(eps_filename.c_str());
   c1->SaveAs(png_filename.c_str());
+
+  // remove file data and bin.txt
+  remove(xbin_filename.c_str());
+  remove(ybin_filename.c_str());
+  remove(data_filename.c_str());
 }
 
 vector<Double_t> readfile(string filename)
