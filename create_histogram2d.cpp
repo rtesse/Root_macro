@@ -44,7 +44,8 @@ void create_histogram2d(string xbin_filename,
   histo2d->Scale(scale_theta);
 
   // Set the x axis in log scale_theta
-  c1->SetLogx();
+  //c1->SetLogx();
+
   // Drawing and save
   gStyle->SetPalette(1);
   histo2d->Draw("LEGO");
