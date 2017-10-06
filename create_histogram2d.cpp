@@ -46,7 +46,6 @@ void create_histogram2d(string xbin_filename,
 
   // Set the x axis in log scale_theta
   //c1->SetLogx();
-  //c1->SetLogy();
 
   // Drawing and save
   gStyle->SetPalette(1);
