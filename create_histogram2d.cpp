@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 #include <iostream>
 #include "TMath.h"
 #include "TROOT.h"
@@ -82,6 +83,8 @@ vector<Double_t> readfile(string filename)
     return data;
 }
 =======
+=======
+>>>>>>> 4256536c06c1b9746238bddc823d43a0c102b22c
 #include <iostream>
 #include "TMath.h"
 #include "TROOT.h"
@@ -164,4 +167,7 @@ vector<Double_t> readfile(string filename)
     }
     return data;
 }
+<<<<<<< HEAD
+>>>>>>> 4256536c06c1b9746238bddc823d43a0c102b22c
+=======
 >>>>>>> 4256536c06c1b9746238bddc823d43a0c102b22c
