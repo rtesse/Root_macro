@@ -44,7 +44,7 @@ void create_histogram2d(string xbin_filename,
   Double_t scale_theta = norm/(histo2d->Integral());
   histo2d->Scale(scale_theta);
 
-  // Set the x axis in log scale_theta
+  // Set the x, y and z axis in log scale_theta
   //c1->SetLogx();
   //c1->SetLogy();
   //c1->SetLogz();
