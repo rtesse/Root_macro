@@ -49,8 +49,9 @@ void create_profile(string xbin_filename,
   //c1->SetLogz();
 
   // Drawing and save
+  // see drawing option at https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html
 
-  profile->Draw("Hist l");
+  profile->Draw("E1X0 SAME HIST");
   string root_filename=histo_filename+".root";
   string eps_filename=histo_filename+".eps";
   string png_filename=histo_filename+".png";
