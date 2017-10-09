@@ -26,7 +26,7 @@ void create_profile(string xbin_filename,
   gStyle->SetOptStat(0);
 
   // Create the histo, open the file and fill it
-  TProfile *histo2d = new TProfile("h2","",xbin.size()-1,&xbin[0]);
+  TProfile *profile = new TProfile("h2","",xbin.size()-1,&xbin[0]);
   ifstream datafile(data_filename);
   string line;
   // Temporaire
@@ -35,13 +35,13 @@ void create_profile(string xbin_filename,
   while (1) {
     datafile >> x >> y;
       if (!datafile.good()) break;
-      histo2d->Fill(x,y);
+      profile->Fill(x,y);
      }
 
   // Scale the histogramdd
   Double_t norm = 1;
-  Double_t scale_theta = norm/(histo2d->Integral());
-  histo2d->Scale(scale_theta);
+  Double_t scale_theta = norm/(profile->Integral());
+  profile->Scale(scale_theta);
 
   // Set the x, y and z axis in log scale
   //c1->SetLogx();
@@ -50,7 +50,7 @@ void create_profile(string xbin_filename,
 
   // Drawing and save
 
-  histo2d->Draw("l");
+  profile->Draw("l");
   string root_filename=histo_filename+".root";
   string eps_filename=histo_filename+".eps";
   string png_filename=histo_filename+".png";
