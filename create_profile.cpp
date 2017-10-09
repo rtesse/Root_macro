@@ -50,7 +50,7 @@ void create_profile(string xbin_filename,
 
   // Drawing and save
 
-  profile->Draw("l");
+  profile->Draw("Hist l");
   string root_filename=histo_filename+".root";
   string eps_filename=histo_filename+".eps";
   string png_filename=histo_filename+".png";
