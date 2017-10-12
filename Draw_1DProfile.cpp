@@ -15,7 +15,7 @@ using namespace std;
 
 vector<Double_t> readfile(string filename);
 
-void create_profile(string xbin_filename,
+void Draw_1DProfile(string xbin_filename,
                         string data_filename,
                         string histo_filename)
 {
