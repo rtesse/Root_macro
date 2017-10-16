@@ -82,7 +82,7 @@ void Draw_2DProfile(string xbin_filename,
   c1->SaveAs(png_filename.c_str());
 
   // remove file data and bin.txt
-  //remove(data_filename.c_str());
+  remove(data_filename.c_str());
 }
 
 vector<Double_t> readfile(string filename)
