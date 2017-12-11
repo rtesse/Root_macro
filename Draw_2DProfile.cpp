@@ -27,9 +27,14 @@ void Draw_2DProfile(string xbin_filename,
   vector<Double_t> ybin = readfile(ybin_filename);
 
   gROOT->Reset();
-  TCanvas *c1 = new TCanvas("c1");
+  TCanvas * c1 = new TCanvas("c", "c");
+  c1->SetCanvasSize(1500,1500);
+  c1->SetWindowSize(15000,600);
+
+
   gStyle->SetOptStat(0);
-  gStyle->SetPalette(55);
+  gStyle->SetPalette(55); // put in the terminal to change the colorbar
+
 
   // Create the histo, open the file and fill it
   TProfile2D *profile2d = new TProfile2D("h2","",
@@ -42,7 +47,7 @@ void Draw_2DProfile(string xbin_filename,
   Int_t nlines = 0;
 
   while (!datafile.eof()) {
-
+    cout << x << " "<< y << " "<< z << endl;
     datafile >> x >> y >> z;
     if (!datafile.good()) break;
     profile2d->Fill(x,y,z);
@@ -51,11 +56,12 @@ void Draw_2DProfile(string xbin_filename,
   // Drawing profile2d
   // see drawing option at https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html
 
-  profile2d->GetZaxis()->SetRangeUser(zmin, zmax);
+  //profile2d->GetZaxis()->SetRangeUser(zmin, zmax);
   profile2d->Draw("COLZ");//"E1X0 SAME HIST");
 
   //superimpose lines at the xbins positions
   TLine l;
+
   c1->Update();
 
   Double_t ymin = c1->GetUymin();
@@ -73,16 +79,28 @@ void Draw_2DProfile(string xbin_filename,
     l.DrawLine(xmin,ybin[bin],xmax,ybin[bin]);
   }
 
+
+
+    TEllipse el1(0.,0.,5.,5.);
+    el1.SetFillColor(3);
+    el1.SetFillStyle(0);
+    el1.SetLineColor(1);
+    el1.SetLineStyle(1);
+    el1.SetLineWidth(2);
+    el1.Draw();
+
   // Save file
   string root_filename=histo_filename+".root";
-  string eps_filename=histo_filename+".eps";
+  string pdf_filename=histo_filename+".pdf";
   string png_filename=histo_filename+".png";
   c1->SaveAs(root_filename.c_str());
-  c1->SaveAs(eps_filename.c_str());
+  c1->SaveAs(pdf_filename.c_str());
   c1->SaveAs(png_filename.c_str());
 
   // remove file data and bin.txt
   remove(data_filename.c_str());
+  remove(xbin_filename.c_str());
+  remove(ybin_filename.c_str());
 }
 
 vector<Double_t> readfile(string filename)
