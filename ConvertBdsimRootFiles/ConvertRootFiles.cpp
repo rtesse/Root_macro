@@ -53,15 +53,15 @@ int main(int argc, char** argv)
                  << "Y" << "\t"
                  << "Z" << "\t"
                  << "Energy" << "\t"
-                 << "StepLength" << "\t"
-                 << "ParentId" << "\n";
+                 << "StepLength" << "n";
 
     int current_evt = 0;
     TTree *tree = (TTree*)file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
-    int partId = 2112; // neutron particle
+    int neutron_partId = 2112; // neutron particle
 
-    while (reader.Next()) {
+    while (reader.Next())
+    {
         vector<Float_t> data_elossX = *elossX;
         vector<Float_t> data_elossY = *elossY;
         vector<Float_t> data_elossZ = *elossZ;
@@ -72,22 +72,22 @@ int main(int argc, char** argv)
         int size = data_elossX.size();
         for (unsigned int i =0; i < size; i++)
         {
+            if(data_elossPartID[i] == neutron_partId)
+            {
                 results_file << data_elossX[i] << "\t"
                              << data_elossY[i] << "\t"
                              << data_elossZ[i] << "\t"
                              << data_elossEne[i] << "\t"
-                             << data_elossStL[i] << "\t"
-                             << data_elossPartID[i] << "\n";
-
-            if(current_evt % (nevents/100) ==0)
-            {
-                cout <<"Begin treatment of event #" <<current_evt << endl;
+                             << data_elossStL[i] << "\n";
             }
-            current_evt++;
         }
-
-        results_file.close();
-        cout << "Finish" <<endl;
-        return 0;
+        if(current_evt % (nevents/100) ==0)
+        {
+            cout <<"Begin treatment of event #" <<current_evt << endl;
+        }
+        current_evt++;
     }
+    results_file.close();
+    cout << "Finish" <<endl;
+    return 0;
 }
