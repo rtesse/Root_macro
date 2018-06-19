@@ -50,15 +50,16 @@ int main(int argc, char** argv)
 
     // Loop over all entries of the TTree or TChain.
     results_file << "X" << "\t"
-         << "Y" << "\t"
-         << "Z" << "\t"
-         << "Energy" << "\t"
-         << "StepLength" << "\t"
-         << "PartID" << "\n";
+                 << "Y" << "\t"
+                 << "Z" << "\t"
+                 << "Energy" << "\t"
+                 << "StepLength" << "\t"
+                 << "PartID" << "\n";
 
     int current_evt = 0;
     TTree *tree = (TTree*)file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
+    int partId = 2112; // neutron particle
 
     while (reader.Next()) {
         vector<Float_t> data_elossX = *elossX;
@@ -71,22 +72,24 @@ int main(int argc, char** argv)
         int size = data_elossX.size();
         for (unsigned int i =0; i < size; i++)
         {
-            results_file << data_elossX[i] << "\t"
-                 << data_elossY[i] << "\t"
-                 << data_elossZ[i] << "\t"
-                 << data_elossEne[i] << "\t"
-                 << data_elossStL[i] << "\t"
-                 << data_elossPartID[i] << "\n";
+            if(data_elossPartID[i] == partId)
+            {
+                results_file << data_elossX[i] << "\t"
+                             << data_elossY[i] << "\t"
+                             << data_elossZ[i] << "\t"
+                             << data_elossEne[i] << "\t"
+                             << data_elossStL[i] << "\n";
+            }
+
+            if(current_evt % (nevents/100) ==0)
+            {
+                cout <<"Begin treatment of event #" <<current_evt << endl;
+            }
+            current_evt++;
         }
 
-        if(current_evt % (nevents/100) ==0)
-        {
-            cout <<"Begin treatment of event #" <<current_evt << endl;
-        }
-        current_evt++;
+        results_file.close();
+        cout << "Finish" <<endl;
+        return 0;
     }
-
-    results_file.close();
-    cout << "Finish" <<endl;
-    return 0;
 }
