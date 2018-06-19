@@ -53,13 +53,12 @@ int main(int argc, char** argv)
                  << "Y" << "\t"
                  << "Z" << "\t"
                  << "Energy" << "\t"
-                 << "StepLength" << "\t"
-                 << "PartID" << "\n";
+                 << "StepLength" << "\n";
 
     int current_evt = 0;
     TTree *tree = (TTree*)file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
-    //int partId = 2112; // neutron particle
+    int partId = 2112; // neutron particle
 
     while (reader.Next()) {
         vector<Float_t> data_elossX = *elossX;
@@ -72,15 +71,14 @@ int main(int argc, char** argv)
         int size = data_elossX.size();
         for (unsigned int i =0; i < size; i++)
         {
-            //if(data_elossPartID[i] == partId)
-            //{
+            if(data_elossPartID[i] == partId)
+            {
                 results_file << data_elossX[i] << "\t"
                              << data_elossY[i] << "\t"
                              << data_elossZ[i] << "\t"
                              << data_elossEne[i] << "\t"
-                             << data_elossStL[i] << "\t"
-                             << data_elossPartID[i] << "\n";
-            //}
+                             << data_elossStL[i] << "\n";
+            }
 
             if(current_evt % (nevents/100) ==0)
             {
