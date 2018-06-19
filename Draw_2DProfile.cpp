@@ -33,8 +33,13 @@ void Draw_2DProfile(string xbin_filename,
 
 
   gStyle->SetOptStat(0);
-  gStyle->SetPalette(55); // put in the terminal to change the colorbar
-
+  //gStyle->SetPalette(104);
+  gStyle->SetPalette(56,0);
+  gStyle->SetNumberContours(99);
+  gStyle->SetLabelFont(132, "X");
+  gStyle->SetLabelFont(132, "Y");
+  gStyle->SetLabelFont(132, "Z");
+  //TColor::InvertPalette();
 
   // Create the histo, open the file and fill it
   TProfile2D *profile2d = new TProfile2D("h2","",
@@ -56,7 +61,7 @@ void Draw_2DProfile(string xbin_filename,
   // Drawing profile2d
   // see drawing option at https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html
 
-  //profile2d->GetZaxis()->SetRangeUser(zmin, zmax);
+  profile2d->GetZaxis()->SetRangeUser(zmin, zmax);
   profile2d->Draw("COLZ");//"E1X0 SAME HIST");
 
   //superimpose lines at the xbins positions
@@ -93,9 +98,11 @@ void Draw_2DProfile(string xbin_filename,
   string root_filename=histo_filename+".root";
   string pdf_filename=histo_filename+".pdf";
   string png_filename=histo_filename+".png";
+  string tex_filename=histo_filename+".tex";
   c1->SaveAs(root_filename.c_str());
   c1->SaveAs(pdf_filename.c_str());
-  c1->SaveAs(png_filename.c_str());
+  c1->SaveAs(tex_filename.c_str());
+  c1->SaveAs(pdf_filename.c_str());
 
   // remove file data and bin.txt
   remove(data_filename.c_str());
