@@ -53,7 +53,7 @@ int main(int argc, char** argv)
                  << "Y" << "\t"
                  << "Z" << "\t"
                  << "Energy" << "\t"
-                 << "StepLength" << "n";
+                 << "StepLength" << "\n";
 
     int current_evt = 0;
     TTree *tree = (TTree*)file->Get("Event"); // initialising the TREE
