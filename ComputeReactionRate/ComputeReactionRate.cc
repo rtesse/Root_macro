@@ -149,12 +149,6 @@ int main(int argc, char** argv)
             }
 
         }
-
-        if(current_evt == 100000)
-        {
-            break;
-        }
-
         if(current_evt % (nevents/10) == 0)
         {
             cout <<"Begin treatment of event #" << current_evt << " over " << nevents << endl;
