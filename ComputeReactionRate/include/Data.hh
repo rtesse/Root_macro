@@ -28,6 +28,8 @@ public:
     void AfficheTable(const vector<vector <double> > Table);
     vector<vector <double> > LoadTable(string filename);
     vector <double> GetWallProperties(string wallName);
+    void extract_columns(vector<vector<double> >CrsTable, int flag_isotope, double x[], double y[]);
+    double GetInterpCrossSection(double E[], double Crs[], double E_x, int size);
 
 private:
 

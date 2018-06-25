@@ -16,13 +16,10 @@
 #include "TTreeReader.h"
 #include "Data.hh"
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_spline.h>
 
 using namespace std;
 void histo_to_txtfile(TH3F* histo, string filename);
-double GetInterpCrossSection(double &E_x, vector<vector<double> > &CrsTable, int flag_isotope);
-void get_columns(vector<vector<double> >CrsTable, int flag_isotope, double x[], double y[]);
+//double GetInterpCrossSection2(double E[], double Crs[], double E_x, int size);
 
 int main(int argc, char** argv)
 {
@@ -64,6 +61,18 @@ int main(int argc, char** argv)
     vector<vector<double> > Crs_Eu151 = Data::Instance()->LoadTable("CrossSection/CrossSection_Eu151.txt");
     vector<vector<double> > CrsTable_spallation = Data::Instance()->LoadTable("CrossSection/SpallationCrossSection_Concrete_QGSP_BIC_HP.txt");
 
+    int size_crsNa22 = CrsTable_spallation.size();
+    int size_crsEu151 = Crs_Eu151.size();
+
+    double Crs_Na22_x[size_crsNa22];
+    double Crs_Na22_y[size_crsNa22];
+
+    double Crs_Eu151_x[size_crsEu151];
+    double Crs_Eu151_y[size_crsEu151];
+
+    Data::Instance()->extract_columns(Crs_Eu151,1,Crs_Eu151_x,Crs_Eu151_y);
+    Data::Instance()->extract_columns(CrsTable_spallation,1,Crs_Na22_x,Crs_Na22_y);
+
     /// Get the wall properties and create histogram
 
     string wallname = argv[2];
@@ -99,7 +108,7 @@ int main(int argc, char** argv)
     double volume = (x_extent*y_extent*z_extent); // Volume en cm3
 
     /// Treat the files
-    int current_evt=0;
+    Int_t current_evt=0;
 
     while (reader.Next())
     {
@@ -123,9 +132,16 @@ int main(int argc, char** argv)
                 double energy = data_elossEne[i]*1000;
                 double steplength = data_elossStL[i]*100;
 
-                /// To improve : better way to make the interpolation (slow : ROOT::MATH::INTERPOLATOR ??)
-                double value_Eu152 = (GetInterpCrossSection(energy,Crs_Eu151,1))*1e-24;
-                double value_Na22 = (GetInterpCrossSection(energy,CrsTable_spallation,1))*1e-24;
+                double value_Eu152 = (Data::Instance()->GetInterpCrossSection(Crs_Eu151_x,
+                                                            Crs_Eu151_y,
+                                                            energy,
+                                                            size_crsEu151))*1e-24;
+
+
+                double value_Na22 = (Data::Instance()->GetInterpCrossSection(Crs_Na22_x,
+                                                            Crs_Na22_y,
+                                                            energy,
+                                                            size_crsNa22))*1e-24;
 
                 /// Fill the histogram
                 histo_eu152->Fill(xpos,ypos,zpos,steplength*value_Eu152);
@@ -133,9 +149,15 @@ int main(int argc, char** argv)
             }
 
         }
-        if(current_evt % (nevents/1000) == 0)
+
+        if(current_evt == 100000)
         {
-            cout <<"Begin treatment of event #" << current_evt << endl;
+            break;
+        }
+
+        if(current_evt % (nevents/10) == 0)
+        {
+            cout <<"Begin treatment of event #" << current_evt << " over " << nevents << endl;
         }
         current_evt++;
     }
@@ -195,35 +217,4 @@ void histo_to_txtfile(TH3F* histo, string filename)
         }
     }
     results_file.close();
-}
-
-double GetInterpCrossSection(double &E_x, vector<vector<double> > &CrsTable, int flag_isotope)
-{
-    /// Fonction qui renvoie la valeur de la section efficace en fonction de l'énergie.
-    /// Une interpolation linéaire est faite entre deux énergies.
-
-    if(E_x < CrsTable[0][0] || E_x > CrsTable[CrsTable.size()-1][0])
-    {
-        return 0;
-    }
-
-    int flag = 0;
-
-    while(CrsTable[flag][0] < E_x)
-    {
-        flag ++;
-    }
-
-
-    double E_a = CrsTable[flag-1][0];
-    double E_b = CrsTable[flag][0];
-    double Crs_a = CrsTable[flag-1][flag_isotope];
-    double Crs_b = CrsTable[flag][flag_isotope];
-
-    double Crs_x;
-
-    double pente = (Crs_b-Crs_a)/(E_b-E_a);
-    Crs_x = pente*(E_x-E_a)+Crs_a;
-
-    return Crs_x;
 }

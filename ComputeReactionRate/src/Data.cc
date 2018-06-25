@@ -1,6 +1,10 @@
 #include "Data.hh"
 #include <fstream>
 
+
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_spline.h>
+
 using namespace std;
 
 Data::Data()
@@ -164,4 +168,39 @@ vector <double> Data::GetWallProperties(string wallName)
     wallproperties.push_back(Z_max*100);
 
     return wallproperties;
+}
+
+
+void Data::extract_columns(vector<vector<double> >CrsTable, int flag_isotope, double x[], double y[])
+{
+    for (unsigned i =0; i < CrsTable.size(); i++)
+    {
+        x[i] = CrsTable[i][0];
+        y[i] = CrsTable[i][flag_isotope];
+    }
+}
+
+double Data::GetInterpCrossSection(double E[], double Crs[], double E_x, int size)
+{
+    int index;
+    if(E_x < E[0] || E_x > E[size-1])
+    {
+        return 0;
+    }
+    else
+    {
+        index = static_cast<int>(gsl_interp_bsearch (E, E_x, 0, size)); // index low
+    }
+
+    double E_a = E[index];
+    double E_b = E[index+1];
+    double Crs_a = Crs[index];
+    double Crs_b = Crs[index+1];
+
+    double Crs_x;
+
+    double pente = (Crs_b-Crs_a)/(E_b-E_a);
+    Crs_x = pente*(E_x-E_a)+Crs_a;
+
+    return Crs_x;
 }
