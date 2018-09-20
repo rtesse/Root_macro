@@ -33,8 +33,8 @@ void Draw_2DProfile(string xbin_filename,
 
 
   gStyle->SetOptStat(0);
-  //gStyle->SetPalette(104);
-  gStyle->SetPalette(56,0);
+  gStyle->SetPalette(104);
+  //gStyle->SetPalette(56,0);
   gStyle->SetNumberContours(99);
   gStyle->SetLabelFont(132, "X");
   gStyle->SetLabelFont(132, "Y");
