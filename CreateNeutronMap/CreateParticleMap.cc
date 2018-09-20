@@ -34,6 +34,15 @@ int main(int argc, char** argv)
         return 0;
     }
 
+    double ymin = -20;
+    double ymax = 20;
+    if(argc == 12)
+    {
+        ymin = atof(argv[10]);
+        ymax = atof(argv[11]);
+
+    }
+
     cout << "Load rebdsim librairies " << endl;
     gSystem->Load("librebdsim.so");
     gSystem->Load("libbdsimRootEvent");
@@ -68,9 +77,9 @@ int main(int argc, char** argv)
     double yup = atoi(argv[9]);
 
     TH2F* histo = new TH2F("2Dmap",
-                                 "a",
-                                 nbinsX, xlow, xup,
-                                 nbinsY, ylow, yup);
+                           "a",
+                           nbinsX, xlow, xup,
+                           nbinsY, ylow, yup);
 
     /// Treat the files
     Int_t current_evt=0;
@@ -85,7 +94,7 @@ int main(int argc, char** argv)
         int size = data_elossX.size();
         for (unsigned int i =0; i < size; i++)
         {
-            if(data_elossPartID[i] == partId)
+            if(data_elossPartID[i] == partId && data_elossY[i] >= ymin && data_elossY[i] <= ymax)
             {
                 /// Fill the histogram
                 histo->Fill(data_elossZ[i],data_elossX[i]);
@@ -99,19 +108,6 @@ int main(int argc, char** argv)
     }
 
     mapfile.Write();
-
-    /*
-    /// Convert the histogram in a txt file and save it
-    cout << "Convert in a txt file" << endl;
-    string txtFilename = argv[3];
-    char filename_eu152[500];
-    char filename_na22[500];
-    sprintf(filename_eu152,"%s_%s_eu152.txt",txtFilename.c_str(),wallname.c_str());
-    sprintf(filename_na22, "%s_%s_na22.txt",txtFilename.c_str(),wallname.c_str());
-
-    histo_to_txtfile(histo_eu152, filename_eu152);
-    histo_to_txtfile(histo_na22, filename_na22);
-    */
     delete histo;
     cout << "Finish" <<endl;
 
