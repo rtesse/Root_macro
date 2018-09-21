@@ -63,14 +63,14 @@ int main(int argc, char** argv)
     file = new TFile(input_filename);
 
     cout << "Get the tree" << endl;
-    TTreeReader reader("", file);
+    TTreeReader reader("Data", file);
     TTreeReaderValue<Float_t> elossX(reader, "X");
     TTreeReaderValue<Float_t> elossY(reader, "Y");
     TTreeReaderValue<Float_t> elossZ(reader, "Z");
     TTreeReaderValue<Float_t> elossEne(reader, "E");
     TTreeReaderValue<Float_t> elossStepLength(reader, "L");
 
-    TTree *tree = (TTree*)file->Get(""); // initialising the TREE
+    TTree *tree = (TTree*)file->Get("Data"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
     cout <<nevents << endl;
 
