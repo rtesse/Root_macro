@@ -27,6 +27,7 @@ link_directories(${ROOT_INCLUDE_DIRS})
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
+
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 
@@ -37,3 +38,4 @@ target_link_libraries(ComputeReactionRate ${ROOT_LIBRARIES} GSL::gsl GSL::gslcbl
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS ComputeReactionRate DESTINATION bin)
+file(COPY CrossSection DESTINATION .)

@@ -23,13 +23,19 @@ void histo_to_txtfile(TH3F* histo, string filename);
 
 int main(int argc, char** argv)
 {
-    /*
-    if(argc < 3)
-    {
-        cerr << "Error : no enough arguments" << endl;
-        return 0;
-    }
-    */
+
+  //Compute the reaction rate of a specfic isotope.
+  // 1: filename root file
+  // 2: Wall name
+  // 3: filename txt file
+
+
+  if(argc < 3)
+  {
+    cerr << "Error : no enough arguments" << endl;
+    return 0;
+  }
+
 
     cout << "Load rebdsim librairies " << endl;
     gSystem->Load("librebdsim.so");
