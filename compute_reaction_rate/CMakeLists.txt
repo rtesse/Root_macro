@@ -24,14 +24,11 @@ include_directories(${PROJECT_SOURCE_DIR}/include
 
 link_directories(${ROOT_INCLUDE_DIRS})
 
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
-
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 
-add_executable(ComputeReactionRate ComputeReactionRate.cc ${sources} ${headers})
+add_executable(ComputeReactionRate ComputeReactionRate.cc)
 target_link_libraries(ComputeReactionRate ${ROOT_LIBRARIES} GSL::gsl GSL::gslcblas)
 
 #----------------------------------------------------------------------------

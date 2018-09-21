@@ -8,16 +8,21 @@
 #include <sstream>
 #include <math.h>
 #include <stdlib.h>     /* system, NULL, EXIT_FAILURE */
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_spline.h>
 
 #include "TFile.h"
 #include "TH3.h"
 #include "TSystem.h"
 #include "TTree.h"
 #include "TTreeReader.h"
-#include "Data.hh"
 
 
 using namespace std;
+
+void extract_columns(vector<vector<double> >CrsTable, int flag_isotope, double x[], double y[]);
+double GetInterpCrossSection(double E[], double Crs[], double E_x, int size);
+vector<vector<double> > LoadTable(string filename);
 
 int main(int argc, char** argv)
 {
@@ -27,20 +32,25 @@ int main(int argc, char** argv)
   // 2: output.root
   // 3: xmin
   // 4: xmax
-  // 5: ymin
-  // 6: ymax
-  // 7: zmin
-  // 8: zmax
-  // 9: partID
+  // 5: nbinx
+  // 6: ymin
+  // 7: ymax
+  // 8: nbiny
+  // 9: zmin
+  // 10: zmax
+  // 11: nbinz
 
-  /*
-  if(argc < 3)
-  {
-    cerr << "Error : no enough arguments" << endl;
-    return 0;
-  }
-  */
-
+  TString input_filename = argv[1];
+  TString output_filename = argv[2];
+  double xmin = atof(argv[3]);
+  double xmax = atof(argv[4]);
+  Int_t binx = atoi(argv[5]);
+  double ymin = atof(argv[6]);
+  double ymax = atof(argv[7]);
+  Int_t biny = atoi(argv[8]);
+  double zmin = atof(argv[9]);
+  double zmax = atof(argv[10]);
+  Int_t binz = atoi(argv[11]);
 
     cout << "Load rebdsim librairies " << endl;
     gSystem->Load("librebdsim.so");
@@ -49,9 +59,8 @@ int main(int argc, char** argv)
 
     /// Open the root tree
     TFile *file = 0;
-    TString filename = argv[1];
     cout << "Open file" << endl;
-    file = new TFile(filename);
+    file = new TFile(input_filename);
 
     cout << "Get the tree" << endl;
     TTreeReader reader("", file);
@@ -67,8 +76,8 @@ int main(int argc, char** argv)
 
     /// Load Table for the cross section
 
-    vector<vector<double> > Crs_Eu151 = Data::Instance()->LoadTable("CrossSection/CrossSection_Eu151.txt");
-    vector<vector<double> > CrsTable_spallation = Data::Instance()->LoadTable("CrossSection/SpallationCrossSection_Concrete_QGSP_BIC_HP.txt");
+    vector<vector<double> > Crs_Eu151 = LoadTable("CrossSection/CrossSection_Eu151.txt");
+    vector<vector<double> > CrsTable_spallation = LoadTable("CrossSection/SpallationCrossSection_Concrete_QGSP_BIC_HP.txt");
 
     int size_crsNa22 = CrsTable_spallation.size();
     int size_crsEu151 = Crs_Eu151.size();
@@ -79,26 +88,14 @@ int main(int argc, char** argv)
     double Crs_Eu151_x[size_crsEu151];
     double Crs_Eu151_y[size_crsEu151];
 
-    Data::Instance()->extract_columns(Crs_Eu151,1,Crs_Eu151_x,Crs_Eu151_y);
-    Data::Instance()->extract_columns(CrsTable_spallation,1,Crs_Na22_x,Crs_Na22_y);
+    extract_columns(Crs_Eu151,1,Crs_Eu151_x,Crs_Eu151_y);
+    extract_columns(CrsTable_spallation,1,Crs_Na22_x,Crs_Na22_y);
 
     /// Get the wall properties and create histogram
 
-    string wallname = argv[2];
-    vector<double> wallProperties = Data::Instance()->GetWallProperties(wallname);
-
-    double binx = wallProperties[0];
-    double xmin = wallProperties[1];
-    double xmax = wallProperties[2];
-    double biny = wallProperties[3];
-    double ymin = wallProperties[4];
-    double ymax = wallProperties[5];
-    double binz = wallProperties[6];
-    double zmin = wallProperties[7];
-    double zmax = wallProperties[8];
 
     TFile* output_file = 0;
-    output_file = new TFile("output_histo.root","recreate");
+    output_file = new TFile(output_filename,"recreate");
 
     TH3F* histo_eu152 = new TH3F("2DMap_eu152",
                                  "eu152",
@@ -131,13 +128,13 @@ int main(int argc, char** argv)
         Float_t energy = (*elossEne)*1000;
         Float_t stepLength = (*elossStepLength)*100;
 
-        double value_Eu152 = (Data::Instance()->GetInterpCrossSection(Crs_Eu151_x,
+        double value_Eu152 = (GetInterpCrossSection(Crs_Eu151_x,
                                                             Crs_Eu151_y,
                                                             energy,
                                                             size_crsEu151))*1e-24;
 
 
-        double value_Na22 = (Data::Instance()->GetInterpCrossSection(Crs_Na22_x,
+        double value_Na22 = (GetInterpCrossSection(Crs_Na22_x,
                                                             Crs_Na22_y,
                                                             energy,
                                                             size_crsNa22))*1e-24;
@@ -167,4 +164,80 @@ int main(int argc, char** argv)
     cout << "Finish" <<endl;
 
     return 0;
+}
+
+
+void extract_columns(vector<vector<double> >CrsTable, int flag_isotope, double x[], double y[])
+{
+    for (unsigned i =0; i < CrsTable.size(); i++)
+    {
+        x[i] = CrsTable[i][0];
+        y[i] = CrsTable[i][flag_isotope];
+    }
+}
+
+double GetInterpCrossSection(double E[], double Crs[], double E_x, int size)
+{
+    int index;
+    if(E_x < E[0] || E_x > E[size-1])
+    {
+        return 0;
+    }
+    else
+    {
+        index = static_cast<int>(gsl_interp_bsearch (E, E_x, 0, size)); // index low
+    }
+
+    double E_a = E[index];
+    double E_b = E[index+1];
+    double Crs_a = Crs[index];
+    double Crs_b = Crs[index+1];
+
+    double Crs_x;
+
+    double pente = (Crs_b-Crs_a)/(E_b-E_a);
+    Crs_x = pente*(E_x-E_a)+Crs_a;
+
+    return Crs_x;
+}
+
+
+vector<vector<double> > LoadTable(string filename)
+{
+    vector < vector <double> > Table;
+
+    ifstream fichier(filename.c_str(), ios::in);  // on ouvre en lecture
+    if(fichier)  // si l'ouverture a fonctionné
+    {
+        cout << filename << " Succesfuly Open"<< endl;
+        vector <double> column;
+        int currentRow = 0;
+        string contenu;
+        string value;
+
+        while(getline(fichier, contenu))
+        {
+            size_t tabPosition = 0;
+
+            while(tabPosition != std::string::npos)
+            {
+                tabPosition = contenu.find("\t");
+                value = contenu.substr(0,tabPosition);
+                column.push_back((strtod(value.c_str(),NULL)));
+                contenu = contenu.substr(tabPosition+1);
+            }
+
+            Table.push_back(column);
+
+            currentRow ++;
+            column.clear();
+
+        }
+        fichier.close();
+    }
+    else
+    {
+        cerr << "Impossible d'ouvrir le fichier "+ filename << endl;
+    }
+    return Table;
 }
