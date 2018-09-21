@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     /// Create a file for saving ntuples
     TFile* output_file = 0;
     output_file = new TFile(output_filename,"recreate");
-    TNtuple *ntuple = new TNtuple("","","X:Y:Z:E:L");
+    TNtuple *ntuple = new TNtuple("Data","Data","X:Y:Z:E:L");
 
     /// Treat the files
     Int_t current_evt=0;
