@@ -95,8 +95,6 @@ int main(int argc, char** argv)
         {
             if(data_elossPartID[i] == partID)
             {
-              if(xpos > xmin && xpos < xmax && ypos > ymin && ypos < ymax && zpos > zmin && zpos < zmax)
-              {
                 /// Extract data
                 double xpos = data_elossX[i];
                 double ypos = data_elossY[i];
@@ -105,8 +103,10 @@ int main(int argc, char** argv)
                 double steplength = data_elossStL[i]*100; // in cm
 
                 /// Fill the ntuple
-                ntuple->Fill(xpos,ypos,zpos,energy,steplength);
-              }
+                if(xpos > xmin && xpos < xmax && ypos > ymin && ypos < ymax && zpos > zmin && zpos < zmax)
+                {
+                  ntuple->Fill(xpos,ypos,zpos,energy,steplength);
+                }
             }
         }
         if(current_evt % (nevents/10) == 0)
