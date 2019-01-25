@@ -64,6 +64,7 @@ int main(int argc, char **argv) {
     TTreeReaderValue<vector<Float_t>> element_yp(reader, element_name + ".yp");
     TTreeReaderValue<vector<Float_t>> element_zp(reader, element_name + ".zp");
     TTreeReaderValue<vector<Int_t>> element_partId(reader, element_name + ".partID");
+    TTreeReaderValue<vector<Int_t>> element_parentId(reader, element_name + ".parentID");
 
     TTree *tree = (TTree *) input_file->Get("Event"); // initialising the TREE
     int nevents = (Int_t) tree->GetEntries();
@@ -71,7 +72,7 @@ int main(int argc, char **argv) {
     /// Create a file for saving ntuples
     TFile *output_file = 0;
     output_file = new TFile(output_filename, "recreate");
-    TNtuple *ntuple = new TNtuple("Data", "Data", "x:y:z:E:xp:yp:zp:partID");
+    TNtuple *ntuple = new TNtuple("Data", "Data", "X:Y:Z:E:PX:PY:PZ:partID:parentID");
 
     /// Treat the files
     Int_t current_evt = 0;
@@ -85,6 +86,7 @@ int main(int argc, char **argv) {
         vector<Float_t> data_elementyp = *element_yp;
         vector<Float_t> data_elementzp = *element_zp;
         vector<Int_t> data_elementpartID = *element_partId;
+        vector<Int_t> data_elementparentID = *element_parentId;
 
         int size = data_elementx.size();
         for (unsigned int i = 0; i < size; i++) {
@@ -97,6 +99,7 @@ int main(int argc, char **argv) {
             double yp = data_elementyp[i];
             double zp = data_elementzp[i];
             int partID = data_elementpartID[i];
+            int parenttID = data_elementparentID[i];
 
             ntuple->Fill(xpos,ypos,energy,xp,yp,zp,partID);
         }
