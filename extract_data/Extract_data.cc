@@ -26,16 +26,27 @@ int main(int argc, char** argv)
     // 2: output.root
 
 
-    bool extract_by_name = true; // default value
+    bool extract_by_name; // default value
+    bool extract_all;
     string element_name;
     double xmin, xmax, ymin, ymax, zmin, zmax;
 
     cout << argc << endl;
     switch (argc) {
+        case 3:
+        {
+          extract_all = true;
+          extract_by_name = !(extract_all);
+          cout << "Extract all values" << endl;
+	  break;
+        }
         case 4:
         {
+            extract_all = false;
+	    extract_by_name = !(extract_all);
             element_name = (string) argv[3];
-            cout << "Extract using extract_by_name" << endl;
+            cout << "Extract using extract_by_name: not yet implemented" << endl;
+            return -1;
         }
             break;
 
@@ -55,8 +66,8 @@ int main(int argc, char** argv)
         default:
         {
             cerr << "Error : no enough arguments" << endl;
+            return -1;
         }
-            return 0;
     }
 
     TString input_filename = argv[1];
@@ -119,15 +130,18 @@ int main(int argc, char** argv)
             //string volName = data_elossVolName[i];
 
             //TODO : best way to fill the ntuple
-            if(extract_by_name == true)
+            if(extract_by_name)
             {
-                //TODO: see if it is still possible. 
+                //TODO: see if it is still possible.
                 //if(volName.find(element_name) != std::string::npos)
                 //{
                     ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
                 //}
             }
-
+            else if(extract_all)
+            {
+                ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
+            }
             else
             {
                 /// Fill the ntuple
