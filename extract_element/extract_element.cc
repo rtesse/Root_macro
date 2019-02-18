@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     TTreeReaderValue<vector<Float_t>> element_x(reader, element_name + ".x");
     TTreeReaderValue<vector<Float_t>> element_y(reader, element_name + ".y");
     //TODO need to fixe the problem when stored z or s in the TTree
-    // TTreeReaderValue<vector<Float_t >> element_z(reader, element_name+".z");
+    TTreeReaderValue<Float_t > element_s(reader, element_name+".S");
 
     TTreeReaderValue<vector<Float_t>> element_E(reader, element_name + ".energy");
     TTreeReaderValue<vector<Float_t>> element_xp(reader, element_name + ".xp");
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     /// Create a file for saving ntuples
     TFile *output_file = 0;
     output_file = new TFile(output_filename, "recreate");
-    TNtuple *ntuple = new TNtuple("Data", "Data", "X:Y:Z:E:PX:PY:PZ:partID:parentID");
+    TNtuple *ntuple = new TNtuple("Data", "Data", "X:Y:S:E:PX:PY:PZ:partID:parentID");
 
     /// Treat the files
     Int_t current_evt = 0;
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     while (reader.Next()) {
         vector<Float_t> data_elementx = *element_x;
         vector<Float_t> data_elementy = *element_y;
-        // vector<Float_t > data_elements = *element_z;
+        Float_t spos = *element_s;
         vector<Float_t> data_elementE = *element_E;
         vector<Float_t> data_elementxp = *element_xp;
         vector<Float_t> data_elementyp = *element_yp;
@@ -93,15 +93,13 @@ int main(int argc, char **argv) {
             /// Extract data
             double xpos = data_elementx[i];
             double ypos = data_elementy[i];
-            // double spos = 0; //data_elements[i];
             double energy = data_elementE[i] * 1000; // in MeV
             double xp = data_elementxp[i];
             double yp = data_elementyp[i];
             double zp = data_elementzp[i];
             int partID = data_elementpartID[i];
             int parenttID = data_elementparentID[i];
-
-            ntuple->Fill(xpos,ypos,energy,xp,yp,zp,partID);
+            ntuple->Fill(xpos,ypos,spos,energy,xp,yp,zp,partID,parenttID);
         }
         if (current_evt % (nevents / 10) == 0) {
             cout << "Begin treatment of event #" << current_evt << " over " << nevents << endl;

@@ -43,12 +43,13 @@ int main(int argc, char** argv)
         case 4:
         {
             extract_all = false;
-	    extract_by_name = !(extract_all);
+	        extract_by_name = !(extract_all);
             element_name = (string) argv[3];
             cout << "Extract using extract_by_name: not yet implemented" << endl;
-            return -1;
-        }
+            //return -1;
             break;
+        }
+
 
         case 9:
         {
@@ -92,7 +93,7 @@ int main(int argc, char** argv)
     TTreeReaderValue<vector<Float_t>> elossEne(reader, "Eloss.preStepKineticEnergy");
     TTreeReaderValue<vector<Float_t>> elossStepLength(reader, "Eloss.stepLength");
     TTreeReaderValue<vector<Float_t>> elossWeight(reader, "Eloss.weight");
-    //TTreeReaderValue<vector<string>> elossVolName(reader, "Eloss.volName");
+    TTreeReaderValue<vector<string>> elossVolName(reader, "Eloss.volName");
     TTreeReaderValue<vector<int>> elossParentID(reader, "Eloss.partID");
     TTree *tree = (TTree*)input_file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
@@ -113,7 +114,7 @@ int main(int argc, char** argv)
         vector<Float_t> data_elossEne = *elossEne;
         vector<Float_t> data_elossStL = *elossStepLength;
         vector<Float_t> data_elossWeight = *elossWeight;
-        //vector<string> data_elossVolName = *elossVolName;
+        vector<string> data_elossVolName = *elossVolName;
         vector<int> data_elossPartID = *elossParentID;
 
         int size = data_elossX.size();
@@ -127,16 +128,21 @@ int main(int argc, char** argv)
             double steplength = data_elossStL[i]*100; // in cm
             int particle_Id = data_elossPartID[i];
             double weight = data_elossWeight[i];
-            //string volName = data_elossVolName[i];
+            string volName = data_elossVolName[i];
 
             //TODO : best way to fill the ntuple
             if(extract_by_name)
             {
+                string bdsim_element_name = element_name;
+                if (volName != "World")
+                {
+                    bdsim_element_name = "world_PREPEND"+element_name+"boxPhysical_pv"; // temporaire ?
+                }
                 //TODO: see if it is still possible.
-                //if(volName.find(element_name) != std::string::npos)
-                //{
+                if(volName == bdsim_element_name)
+                {
                     ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
-                //}
+                }
             }
             else if(extract_all)
             {
