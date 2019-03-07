@@ -2,8 +2,8 @@
 # Setup the project
 cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 
-set(source_file Extract_data.cc)
-set(Project_name Extract_data)
+set(source_file extract_data.cc)
+set(Project_name extract_data)
 
 project(${Project_name})
 
