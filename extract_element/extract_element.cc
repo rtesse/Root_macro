@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     /// Create a file for saving ntuples
     TFile *output_file = 0;
     output_file = new TFile(output_filename, "recreate");
-    TNtuple *ntuple = new TNtuple("Data", "Data", "X:Y:Z:E:PX:PY:PZ:partID:parentID");
+    TNtuple *ntuple = new TNtuple("Data", "Data", "X:Y:E:PX:PY:PZ:partID:parentID");
 
     /// Treat the files
     Int_t current_evt = 0;
