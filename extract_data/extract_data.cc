@@ -93,7 +93,6 @@ int main(int argc, char** argv)
     TTreeReaderValue<vector<Float_t>> elossEne(reader, "Eloss.preStepKineticEnergy");
     TTreeReaderValue<vector<Float_t>> elossStepLength(reader, "Eloss.stepLength");
     TTreeReaderValue<vector<Float_t>> elossWeight(reader, "Eloss.weight");
-    TTreeReaderValue<vector<string>> elossVolName(reader, "Eloss.volName");
     TTreeReaderValue<vector<int>> elossParentID(reader, "Eloss.partID");
     TTree *tree = (TTree*)input_file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
@@ -128,7 +127,6 @@ int main(int argc, char** argv)
             double steplength = data_elossStL[i]*100; // in cm
             int particle_Id = data_elossPartID[i];
             double weight = data_elossWeight[i];
-            string volName = data_elossVolName[i];
 
             //TODO : best way to fill the ntuple
             if(extract_by_name)

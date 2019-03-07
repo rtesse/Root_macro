@@ -17,11 +17,10 @@
 #include "TTree.h"
 #include "TTreeReader.h"
 
-
 using namespace std;
 
 void extract_columns(vector<vector<double> >CrsTable, int flag_isotope, double x[], double y[]);
-double GetInterpCrossSection(double E[], double Crs[], double E_x, int size);
+double GetInterpValue(double E[], double Crs[], double E_x, int size);
 vector<vector<double> > LoadTable(string filename);
 
 int main(int argc, char** argv)
@@ -58,8 +57,6 @@ int main(int argc, char** argv)
 
 
     /// Open the root tree
-    /// TODO: Open from extract_data.
-    
     TFile *file = 0;
     cout << "Open file" << endl;
     file = new TFile(input_filename);
