@@ -22,7 +22,7 @@
 using namespace std;
 
 void extract_columns(vector<vector<double> >h10_Table, int flag_isotope, double x[], double y[]);
-double GetInterpCrossSection(double E[], double h10[], double E_x, int size);
+double GetInterp_h10(double E[], double h10[], double E_x, int size);
 vector<vector<double> > LoadTable(string filename);
 
 int main(int argc, char** argv)
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
   double zmin = atof(argv[9]);
   double zmax = atof(argv[10]);
   Int_t binz = atoi(argv[11]);
-  TString option = atoi(arg[12]);
+ // TString option = atoi(argv[12]);
 
 
     /// Open the root tree
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     TTreeReaderValue<Float_t> elossZ(reader, "Z");
     TTreeReaderValue<Float_t> elossEne(reader, "E");
     TTreeReaderValue<Float_t> elossStepLength(reader, "L");
-    TTreeReaderValue<Float_t> particleID(reader, "partID");
+    TTreeReaderValue<Float_t> particleID(reader, "PartId");
 
     TTree *tree = (TTree*)file->Get("Data"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
@@ -76,8 +76,8 @@ int main(int argc, char** argv)
 
     /// Load the h10 coefficients Tables
 
-    vector<vector<double> > h10_protons = LoadTable("../h10_coeffs/protons.txt");
-    vector<vector<double> > h10_neutrons = LoadTable("../h10_coeffs/neutrons.txt");
+    vector<vector<double> > h10_protons = LoadTable("../h10_coeffs/h10protons.txt");
+    vector<vector<double> > h10_neutrons = LoadTable("../h10_coeffs/h10neutrons.txt");
 
     int size_h10protons = h10_protons.size();
     int size_h10neutrons = h10_neutrons.size();
@@ -100,43 +100,38 @@ int main(int argc, char** argv)
     TProfile2D* histo_xy_protons = new TProfile2D("protons_xy",
                                  "H10_xy_protons",
                                  binx, xmin, xmax,
-                                 biny, ymin, ymax,
-				 option);
+                                 biny, ymin, ymax);
 
     TProfile2D* histo_yz_protons = new TProfile2D("protons_yz",
                                  "H10_yz_protons",
                                  binx, ymin, ymax,
-                                 biny, zmin, zmax,
-				 option);
+                                 biny, zmin, zmax);
 
     TProfile2D* histo_zx_protons = new TProfile2D("protons_zx",
                                  "H10_zx_protons",
                                  binx, zmin, zmax,
-                                 biny, xmin, xmax,
-				 option);
+                                 biny, xmin, xmax);
 
     TProfile2D* histo_xy_neutrons = new TProfile2D("neutrons_xy",
                                  "H10_xy_neutrons",
                                  binx, xmin, xmax,
-                                 biny, ymin, ymax,
-				 option);
+                                 biny, ymin, ymax);
 
     TProfile2D* histo_yz_neutrons = new TProfile2D("neutrons_yz",
                                  "H10_yz_neutrons",
                                  binx, ymin, ymax,
-                                 biny, zmin, zmax,
-				 option);
+                                 biny, zmin, zmax);
 
     TProfile2D* histo_zx_neutrons = new TProfile2D("neutrons_zx",
                                  "H10_zx_neutrons",
                                  binx, zmin, zmax,
-                                 biny, xmin, xmax,
-				 option);
+                                 biny, xmin, xmax);
 
 
     double x_extent = ((xmax - xmin)/binx)*100;
     double y_extent = ((ymax - ymin)/biny)*100;
     double z_extent = ((zmax - zmin)/binz)*100;
+    cout << "One cellule has the following dimensions :" << x_extent << "cm in x," << y_extent << "cm3 in y, and" << z_extent << "cm in z" <<endl;
 
     double volume = (x_extent*y_extent*z_extent); // To calculate the volume en cm3
 
@@ -149,27 +144,29 @@ int main(int argc, char** argv)
         Float_t xpos = *elossX;
         Float_t ypos = *elossY;
         Float_t zpos = *elossZ;
-        Float_t energy = (*elossEne)*0.001; // To convert the energy in MeV
-        Float_t stepLength = (*elossStepLength)*100;
-	Float_t particleID = *particleID;
+        Float_t energy = (*elossEne)*0.001; // To convert the energy in GeV
+        Float_t stepLength = (*elossStepLength);
+	Float_t ID = *particleID;
 
-	if(particleID == 2112)
+	if(ID == 2212)
 	{
 		double value_h10_proton = (GetInterp_h10(h10_protons_x,
 						         h10_protons_y,
-                                                          energy,
-                                                          size_h10_protons))*1000000; // To get the h10 value in micro Sievert
+                                                         energy,
+                                                         size_h10protons))*1000000; // To get the h10 value in micro Sievert
+                //cout << "Proton encountered. The value of h10 is :" << value_h10_proton << endl;
 		histo_xy_protons->Fill(xpos,ypos,stepLength*value_h10_proton);
 		histo_yz_protons->Fill(ypos,zpos,stepLength*value_h10_proton);
 		histo_zx_protons->Fill(zpos,xpos,stepLength*value_h10_proton);
 	}
 
-	else if (particleID == 2212)
+	else if (ID == 2112)
 	{
 		double value_h10_neutron = (GetInterp_h10(h10_neutrons_x,
 						          h10_neutrons_y,
                                                           energy,
-                                                          size_h10_neutrons))*1000000; // To get the h10 value in micro Sievert
+                                                          size_h10neutrons))*1000000; // To get the h10 value in micro Sievert
+                //cout << "Neutron encountered. The value of h10 is :" << value_h10_neutron << endl;
 		histo_xy_neutrons->Fill(xpos,ypos,stepLength*value_h10_neutron);
 		histo_yz_neutrons->Fill(ypos,zpos,stepLength*value_h10_neutron);
 		histo_zx_neutrons->Fill(zpos,xpos,stepLength*value_h10_neutron);
@@ -183,8 +180,7 @@ int main(int argc, char** argv)
     }
 
 
-
-    cout << "Scale the histo" << endl;
+    cout << "Scaling of the histos" << endl;
     histo_xy_protons->Scale(1/(volume));
     histo_yz_protons->Scale(1/(volume));
     histo_zx_protons->Scale(1/(volume));
@@ -204,10 +200,10 @@ int main(int argc, char** argv)
 
 void extract_columns(vector<vector<double> >h10_Table, int flag_isotope, double x[], double y[])
 {
-    for (unsigned i =0; i < CrsTable.size(); i++)
+    for (unsigned i =0; i < h10_Table.size(); i++)
     {
-        x[i] = CrsTable[i][0];
-        y[i] = CrsTable[i][flag_isotope];
+        x[i] = h10_Table[i][0];
+        y[i] = h10_Table[i][flag_isotope];
     }
 }
 
