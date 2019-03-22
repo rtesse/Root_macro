@@ -18,6 +18,7 @@
 #include "TTreeReader.h"
 #include "TH2.h"
 #include "TProfile2D.h"
+#include "TProfile3D.h"
 
 using namespace std;
 
@@ -78,9 +79,14 @@ int main(int argc, char** argv)
 
     vector<vector<double> > h10_protons = LoadTable("../h10_coeffs/h10protons.txt");
     vector<vector<double> > h10_neutrons = LoadTable("../h10_coeffs/h10neutrons.txt");
+    vector<vector<double> > h10_electrons = LoadTable("../h10_coeffs/h10electrons.txt");
+    vector<vector<double> > h10_photons = LoadTable("../h10_coeffs/h10photons.txt");
+
 
     int size_h10protons = h10_protons.size();
     int size_h10neutrons = h10_neutrons.size();
+    int size_h10electrons = h10_electrons.size();
+    int size_h10photons = h10_photons.size();
 
     double h10_protons_x[size_h10protons];
     double h10_protons_y[size_h10protons];
@@ -88,8 +94,16 @@ int main(int argc, char** argv)
     double h10_neutrons_x[size_h10neutrons];
     double h10_neutrons_y[size_h10neutrons];
 
+    double h10_electrons_x[size_h10electrons];
+    double h10_electrons_y[size_h10electrons];
+
+    double h10_photons_x[size_h10photons];
+    double h10_photons_y[size_h10photons];
+
     extract_columns(h10_protons,1,h10_protons_x,h10_protons_y);
     extract_columns(h10_neutrons,1,h10_neutrons_x,h10_neutrons_y);
+    extract_columns(h10_electrons,1,h10_electrons_x,h10_electrons_y);
+    extract_columns(h10_photons,1,h10_photons_x,h10_photons_y);
 
     /// Get the wall properties and create the 2D histograms
 
@@ -97,20 +111,29 @@ int main(int argc, char** argv)
     TFile* output_file = 0;
     output_file = new TFile(output_filename,"recreate");
 
-    TProfile2D* histo_xy_electrons = new TProfile2D("electrons_xy",
-                                 "H10_xy_electrons",
-                                 binx, xmin, xmax,
-                                 biny, ymin, ymax);
+    TProfile3D* histo_3D_protons = new TProfile3D("protons_3D",
+				 "H1O_3D_protons",
+				 binx, xmin, xmax,
+				 biny, ymin, ymax,
+				 binz, zmin, zmax);
 
-    TProfile2D* histo_xy_electrons = new TProfile2D("electrons_xy",
-                                 "H10_xy_electrons",
-                                 binx, xmin, xmax,
-                                 biny, ymin, ymax);
+    TProfile3D* histo_3D_neutrons = new TProfile3D("neutrons_3D",
+				 "H1O_3D_neutrons",
+				 binx, xmin, xmax,
+				 biny, ymin, ymax,
+				 binz, zmin, zmax);
 
-    TProfile2D* histo_xy_electrons = new TProfile2D("electrons_xy",
-                                 "H10_xy_electrons",
-                                 binx, xmin, xmax,
-                                 biny, ymin, ymax);
+    TProfile3D* histo_3D_electrons = new TProfile3D("electrons_3D",
+				 "H1O_3D_electrons",
+				 binx, xmin, xmax,
+				 biny, ymin, ymax,
+				 binz, zmin, zmax);
+
+    TProfile3D* histo_3D_photons = new TProfile3D("photons_3D",
+				 "H1O_3D_photons",
+				 binx, xmin, xmax,
+				 biny, ymin, ymax,
+				 binz, zmin, zmax);
 
     TProfile2D* histo_xy_protons = new TProfile2D("protons_xy",
                                  "H10_xy_protons",
@@ -119,13 +142,13 @@ int main(int argc, char** argv)
 
     TProfile2D* histo_yz_protons = new TProfile2D("protons_yz",
                                  "H10_yz_protons",
-                                 binx, ymin, ymax,
-                                 biny, zmin, zmax);
+                                 biny, ymin, ymax,
+                                 binz, zmin, zmax);
 
     TProfile2D* histo_zx_protons = new TProfile2D("protons_zx",
                                  "H10_zx_protons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo_xy_neutrons = new TProfile2D("neutrons_xy",
                                  "H10_xy_neutrons",
@@ -134,64 +157,93 @@ int main(int argc, char** argv)
 
     TProfile2D* histo_yz_neutrons = new TProfile2D("neutrons_yz",
                                  "H10_yz_neutrons",
-                                 binx, ymin, ymax,
-                                 biny, zmin, zmax);
+                                 biny, ymin, ymax,
+                                 binz, zmin, zmax);
 
     TProfile2D* histo_zx_neutrons = new TProfile2D("neutrons_zx",
                                  "H10_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo1_zx_neutrons = new TProfile2D("h1_neutrons_zx",
                                  "h1_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo2_zx_neutrons = new TProfile2D("h2_neutrons_zx",
                                  "h2_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo3_zx_neutrons = new TProfile2D("h3_neutrons_zx",
                                  "h3_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo4_zx_neutrons = new TProfile2D("h4_neutrons_zx",
                                  "h4_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo5_zx_neutrons = new TProfile2D("h5_neutrons_zx",
                                  "h5_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo6_zx_neutrons = new TProfile2D("h6_neutrons_zx",
                                  "h6_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo7_zx_neutrons = new TProfile2D("h7_neutrons_zx",
                                  "h7_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo8_zx_neutrons = new TProfile2D("h8_neutrons_zx",
                                  "h8_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     TProfile2D* histo9_zx_neutrons = new TProfile2D("h9_neutrons_zx",
                                  "h9_zx_neutrons",
-                                 binx, zmin, zmax,
-                                 biny, xmin, xmax);
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
+		
+    TProfile2D* histo_xy_electrons = new TProfile2D("electrons_xy",
+                                 "H10_xy_electrons",
+                                 binx, xmin, xmax,
+                                 biny, ymin, ymax);
 
+    TProfile2D* histo_yz_electrons = new TProfile2D("electrons_yz",
+                                 "H10_xy_electrons",
+                                 biny, ymin, ymax,
+                                 binz, zmin, zmax);
+
+    TProfile2D* histo_zx_electrons = new TProfile2D("electrons_zx",
+                                 "H10_xy_electrons",
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
+		
+    TProfile2D* histo_xy_photons = new TProfile2D("photons_xy",
+                                 "H10_xy_photons",
+                                 binx, xmin, xmax,
+                                 biny, ymin, ymax);
+
+    TProfile2D* histo_yz_photons = new TProfile2D("photons_yz",
+                                 "H10_xy_photons",
+                                 biny, ymin, ymax,
+                                 binz, zmin, zmax);
+
+    TProfile2D* histo_zx_photons = new TProfile2D("photons_zx",
+                                 "H10_xy_photons",
+                                 binz, zmin, zmax,
+                                 binx, xmin, xmax);
 
     double x_extent = ((xmax - xmin)/binx)*100;
     double y_extent = ((ymax - ymin)/biny)*100;
     double z_extent = ((zmax - zmin)/binz)*100;
-    cout << "One cellule has the following dimensions :" << x_extent << "cm in x," << y_extent << "cm3 in y, and" << z_extent << "cm in z" <<endl;
+    cout << "One cellule has the following dimensions : " << x_extent << " cm in x, " << y_extent << " cm in y and " << z_extent << " cm in z." <<endl;
 
     double volume = (x_extent*y_extent*z_extent); // To calculate the volume en cm3
 
@@ -219,9 +271,10 @@ int main(int argc, char** argv)
 		histo_xy_protons->Fill(xpos,ypos,stepLength*value_h10_proton);
 		histo_yz_protons->Fill(ypos,zpos,stepLength*value_h10_proton);
 		histo_zx_protons->Fill(zpos,xpos,stepLength*value_h10_proton);
+		histo_3D_protons->Fill(xpos,ypos,zpos,stepLength*value_h10_proton);
 	}
 
-	else if (ID == 2112)
+	else if(ID == 2112)
 	{
 		double value_h10_neutron = (GetInterp_h10(h10_neutrons_x,
 						          h10_neutrons_y,
@@ -231,6 +284,8 @@ int main(int argc, char** argv)
 		histo_xy_neutrons->Fill(xpos,ypos,stepLength*value_h10_neutron);
 		histo_yz_neutrons->Fill(ypos,zpos,stepLength*value_h10_neutron);
 		histo_zx_neutrons->Fill(zpos,xpos,stepLength*value_h10_neutron);
+		histo_3D_neutrons->Fill(xpos,ypos,zpos,stepLength*value_h10_neutron);
+
 		if (ypos > -4.5 && ypos < -3.5)
 		{
 			histo1_zx_neutrons->Fill(zpos,xpos,stepLength*value_h10_neutron);
@@ -269,6 +324,32 @@ int main(int argc, char** argv)
 		}
 	}
 
+	else if(ID == 11)
+	{
+		double value_h10_electron = (GetInterp_h10(h10_electrons_x,
+						           h10_electrons_y,
+                                                           energy,
+                                                           size_h10electrons))*1000000; // To get the h10 value in micro Sievert
+                //cout << "Electron encountered. The value of h10 is :" << value_h10_electron << endl;
+		histo_xy_electrons->Fill(xpos,ypos,stepLength*value_h10_electron);
+		histo_yz_electrons->Fill(ypos,zpos,stepLength*value_h10_electron);
+		histo_zx_electrons->Fill(zpos,xpos,stepLength*value_h10_electron);
+		histo_3D_electrons->Fill(xpos,ypos,zpos,stepLength*value_h10_electron);
+	}
+
+	else if(ID == 22)
+	{
+		double value_h10_photon = (GetInterp_h10(h10_photons_x,
+						           h10_photons_y,
+                                                           energy,
+                                                           size_h10photons))*1000000; // To get the h10 value in micro Sievert
+                //cout << "Photon encountered. The value of h10 is :" << value_h10_photon << endl;
+		histo_xy_photons->Fill(xpos,ypos,stepLength*value_h10_photon);
+		histo_yz_photons->Fill(ypos,zpos,stepLength*value_h10_photon);
+		histo_zx_photons->Fill(zpos,xpos,stepLength*value_h10_photon);
+		histo_3D_photons->Fill(xpos,ypos,zpos,stepLength*value_h10_photon);
+	}
+
         if(current_evt % (nevents/10) == 0)
         {
           cout <<"Begin treatment of event #" << current_evt << " over " << nevents << endl;
@@ -276,7 +357,13 @@ int main(int argc, char** argv)
         current_evt++;
     }
 
-    cout << "Scaling of the histos" << endl;
+    cout << "Scaling the histograms" << endl;
+
+    histo_3D_protons->Scale(1/(volume));
+    histo_3D_neutrons->Scale(1/(volume));
+    histo_3D_electrons->Scale(1/(volume));
+    histo_3D_photons->Scale(1/(volume));
+
     histo_xy_protons->Scale(1/(volume));
     histo_yz_protons->Scale(1/(volume));
     histo_zx_protons->Scale(1/(volume));
@@ -284,6 +371,14 @@ int main(int argc, char** argv)
     histo_xy_neutrons->Scale(1/(volume));
     histo_yz_neutrons->Scale(1/(volume));
     histo_zx_neutrons->Scale(1/(volume));
+
+    histo_xy_electrons->Scale(1/(volume));
+    histo_yz_electrons->Scale(1/(volume));
+    histo_zx_electrons->Scale(1/(volume));
+
+    histo_xy_photons->Scale(1/(volume));
+    histo_yz_photons->Scale(1/(volume));
+    histo_zx_photons->Scale(1/(volume));
 
     histo1_zx_neutrons->Scale(1/(volume));
     histo2_zx_neutrons->Scale(1/(volume));
@@ -298,7 +393,7 @@ int main(int argc, char** argv)
     cout << "Write the file" << endl;
     output_file->Write();
 
-    cout << "Finish" <<endl;
+    cout << "Game over" <<endl;
 
     return 0;
 }
@@ -346,7 +441,7 @@ vector<vector<double> > LoadTable(string filename)
     ifstream fichier(filename.c_str(), ios::in);  // To open the file in read mode
     if(fichier)  // if the file has been successfully opened
     {
-        cout << filename << " Succesfuly Open"<< endl;
+        cout << filename << " Succesfully opened the file" + filename << endl;
         vector <double> column;
         int currentRow = 0;
         string contenu;
