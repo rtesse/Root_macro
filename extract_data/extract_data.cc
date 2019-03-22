@@ -25,42 +25,23 @@ int main(int argc, char** argv)
     // 1: input.root
     // 2: output.root
 
-
     bool extract_by_name; // default value
     bool extract_all;
     string element_name;
-    double xmin, xmax, ymin, ymax, zmin, zmax;
+    string root_tree;
 
-    cout << argc << endl;
-    switch (argc) {
-        case 3: {
-            extract_all = true;
-            cout << "Extract all values" << endl;
-            break;
-        }
-
-        case 9:
-        {
-            xmin = atof(argv[3]);
-            xmax = atof(argv[4]);
-            ymin = atof(argv[5]);
-            ymax = atof(argv[6]);
-            zmin = atof(argv[7]);
-            zmax = atof(argv[8]);
-            cout << "Extract using extract_by_position" << endl;
-        }
-            break;
-
-        default:
-        {
-            cerr << "Error : no enough arguments" << endl;
-            return -1;
-        }
+    if (argc != 4)
+    {
+        cerr << "Error : no enough arguments" << endl;
+        cerr << "./extract_data input.root output.root root_tree" << endl;
+        return -1;
     }
 
     TString input_filename = argv[1];
     TString output_filename = argv[2];
+    root_tree = argv[3];
 
+    cout << "Extract all values in the "  << root_tree << " root tree" << endl;
     cout << "Load rebdsim librairies " << endl;
     gSystem->Load("librebdsim.so");
     gSystem->Load("libbdsimRootEvent");
@@ -74,20 +55,21 @@ int main(int argc, char** argv)
     TTreeReader reader("Event", input_file);
 
     // Get the desired data (correspond to selection in analysisConfig.txt)
-    TTreeReaderValue<vector<Float_t>> elossX(reader, "ElossWorld.X");
-    TTreeReaderValue<vector<Float_t>> elossY(reader, "ElossWorld.Y");
-    TTreeReaderValue<vector<Float_t>> elossZ(reader, "ElossWorld.Z");
-    TTreeReaderValue<vector<Float_t>> elossEne(reader, "ElossWorld.preStepKineticEnergy");
-    TTreeReaderValue<vector<Float_t>> elossStepLength(reader, "ElossWorld.stepLength");
-    TTreeReaderValue<vector<Float_t>> elossWeight(reader, "ElossWorld.weight");
-    TTreeReaderValue<vector<int>> elossParentID(reader, "ElossWorld.partID");
+    TTreeReaderValue<vector<Float_t>> elossX(reader, (root_tree+".X").c_str());
+    TTreeReaderValue<vector<Float_t>> elossY(reader, (root_tree+".Y").c_str());
+    TTreeReaderValue<vector<Float_t>> elossZ(reader, (root_tree+".Z").c_str());
+    TTreeReaderValue<vector<Float_t>> elossEne(reader, (root_tree+".preStepKineticEnergy").c_str());
+    TTreeReaderValue<vector<Float_t>> elossStepLength(reader, (root_tree+".stepLength").c_str());
+    TTreeReaderValue<vector<Float_t>> elossWeight(reader, (root_tree+".weight").c_str());
+    TTreeReaderValue<vector<int>> elossParentID(reader, (root_tree+".partID").c_str());
+
     TTree *tree = (TTree*)input_file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
 
     /// Create a file for saving ntuples
     TFile* output_file = 0;
     output_file = new TFile(output_filename,"recreate");
-    TNtuple *ntuple = new TNtuple("Data","Data","X:Y:Z:E:L:PartId:Weight");
+    TNtuple *ntuple = new TNtuple("Data","particle_data","X:Y:Z:E:L:PartId:Weight");
 
     /// Treat the files
     Int_t current_evt=0;
@@ -113,19 +95,7 @@ int main(int argc, char** argv)
             double steplength = data_elossStL[i]*100; // in cm
             int particle_Id = data_elossPartID[i];
             double weight = data_elossWeight[i];
-
-            if(extract_all)
-            {
-                ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
-            }
-            else
-            {
-                /// Fill the ntuple
-                if(xpos > xmin && xpos < xmax && ypos > ymin && ypos < ymax && zpos > zmin && zpos < zmax)
-                {
-                    ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
-                }
-            }
+            ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
         }
         if(current_evt % (nevents/10) == 0)
         {
