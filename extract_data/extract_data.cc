@@ -58,10 +58,13 @@ int main(int argc, char** argv)
     TTreeReaderValue<vector<Float_t>> elossX(reader, (root_tree+".X").c_str());
     TTreeReaderValue<vector<Float_t>> elossY(reader, (root_tree+".Y").c_str());
     TTreeReaderValue<vector<Float_t>> elossZ(reader, (root_tree+".Z").c_str());
+    TTreeReaderValue<vector<Float_t>> elossTime(reader, (root_tree+".T").c_str());
     TTreeReaderValue<vector<Float_t>> elossEne(reader, (root_tree+".preStepKineticEnergy").c_str());
     TTreeReaderValue<vector<Float_t>> elossStepLength(reader, (root_tree+".stepLength").c_str());
     TTreeReaderValue<vector<Float_t>> elossWeight(reader, (root_tree+".weight").c_str());
     TTreeReaderValue<vector<int>> elossParentID(reader, (root_tree+".partID").c_str());
+
+
 
     TTree *tree = (TTree*)input_file->Get("Event"); // initialising the TREE
     int nevents = (Int_t)tree->GetEntries();
@@ -69,7 +72,7 @@ int main(int argc, char** argv)
     /// Create a file for saving ntuples
     TFile* output_file = 0;
     output_file = new TFile(output_filename,"recreate");
-    TNtuple *ntuple = new TNtuple("Data","particle_data","X:Y:Z:E:L:PartId:Weight");
+    TNtuple *ntuple = new TNtuple("Data","particle_data","X:Y:Z:T:E:L:PartId:Weight");
 
     /// Treat the files
     Int_t current_evt=0;
@@ -80,6 +83,7 @@ int main(int argc, char** argv)
         vector<Float_t> data_elossY = *elossY;
         vector<Float_t> data_elossZ = *elossZ;
         vector<Float_t> data_elossEne = *elossEne;
+        vector<Float_t> data_elossTime = *elossTime;
         vector<Float_t> data_elossStL = *elossStepLength;
         vector<Float_t> data_elossWeight = *elossWeight;
         vector<int> data_elossPartID = *elossParentID;
@@ -91,11 +95,12 @@ int main(int argc, char** argv)
             double xpos = data_elossX[i];
             double ypos = data_elossY[i];
             double zpos = data_elossZ[i];
+            double time = data_elossTime[i];
             double energy = data_elossEne[i]*1000; // in MeV
             double steplength = data_elossStL[i]*100; // in cm
             int particle_Id = data_elossPartID[i];
             double weight = data_elossWeight[i];
-            ntuple->Fill(xpos,ypos,zpos,energy,steplength,particle_Id, weight);
+            ntuple->Fill(xpos,ypos,zpos,time,energy,steplength,particle_Id, weight);
         }
         if(current_evt % (nevents/10) == 0)
         {
