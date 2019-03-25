@@ -2,8 +2,8 @@
 # Setup the project
 cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 
-set(source_file compute_Ambient_Dose.cc)
-set(Project_name compute_Ambient_Dose)
+set(source_file Compute_Ambient_Dose.cc)
+set(Project_name Compute_Ambient_Dose)
 
 project(${Project_name})
 
