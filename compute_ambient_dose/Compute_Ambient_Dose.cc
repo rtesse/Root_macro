@@ -77,10 +77,10 @@ int main(int argc, char** argv)
 
     /// Load the h10 coefficients Tables
 
-    vector<vector<double> > h10_protons = LoadTable("../h10_coeffs/h10protons.txt");
-    vector<vector<double> > h10_neutrons = LoadTable("../h10_coeffs/h10neutrons.txt");
-    vector<vector<double> > h10_electrons = LoadTable("../h10_coeffs/h10electrons.txt");
-    vector<vector<double> > h10_photons = LoadTable("../h10_coeffs/h10photons.txt");
+    vector<vector<double> > h10_protons = LoadTable("../h10_coeffs/new_h10protons.txt");
+    vector<vector<double> > h10_neutrons = LoadTable("../h10_coeffs/new_h10neutrons.txt");
+    vector<vector<double> > h10_electrons = LoadTable("../h10_coeffs/new_h10electrons.txt");
+    vector<vector<double> > h10_photons = LoadTable("../h10_coeffs/new_h10photons.txt");
 
 
     int size_h10protons = h10_protons.size();
@@ -216,12 +216,12 @@ int main(int argc, char** argv)
                                  biny, ymin, ymax);
 
     TProfile2D* histo_yz_electrons = new TProfile2D("electrons_yz",
-                                 "H10_xy_electrons",
+                                 "H10_yz_electrons",
                                  biny, ymin, ymax,
                                  binz, zmin, zmax);
 
     TProfile2D* histo_zx_electrons = new TProfile2D("electrons_zx",
-                                 "H10_xy_electrons",
+                                 "H10_zx_electrons",
                                  binz, zmin, zmax,
                                  binx, xmin, xmax);
 		
@@ -231,12 +231,12 @@ int main(int argc, char** argv)
                                  biny, ymin, ymax);
 
     TProfile2D* histo_yz_photons = new TProfile2D("photons_yz",
-                                 "H10_xy_photons",
+                                 "H10_yz_photons",
                                  biny, ymin, ymax,
                                  binz, zmin, zmax);
 
     TProfile2D* histo_zx_photons = new TProfile2D("photons_zx",
-                                 "H10_xy_photons",
+                                 "H10_zx_photons",
                                  binz, zmin, zmax,
                                  binx, xmin, xmax);
 
@@ -390,7 +390,7 @@ int main(int argc, char** argv)
     histo8_zx_neutrons->Scale(1/(volume));
     histo9_zx_neutrons->Scale(1/(volume));
 
-    cout << "Write the file" << endl;
+    cout << "Writing the file" << endl;
     output_file->Write();
 
     cout << "Game over" <<endl;
